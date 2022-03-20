@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -11,11 +11,16 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
+	maven {
+		url "https://maven.terraformersmc.com/releases/"
+	}
+	maven {
+		url "https://jitpack.io"
+	}
+	maven {
+		url "https://maven.shedaniel.me/"
+	}
 }
 
 dependencies {
@@ -26,6 +31,25 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	modImplementation "com.terraformersmc:modmenu:${project.modMenu_version}"
+
+	modImplementation ("com.github.qouteall.ImmersivePortalsMod:q_misc_util:${project.qMiscUtil_version}"){
+		exclude(group: "net.fabricmc.fabric-api")
+		transitive(false)
+	}
+
+	modImplementation ('com.github.qouteall.ImmersivePortalsMod:imm_ptl_core:v1.3.3-1.18'){
+		exclude(group: "net.fabricmc.fabric-api")
+		transitive(false)
+	}
+
+	modApi ("me.shedaniel.cloth:cloth-config-fabric:${project.clothConfig_version}")
+	{
+		exclude (group: "net.fabricmc.fabric-api")
+	}
+
+	include "com.github.qouteall.ImmersivePortalsMod:q_misc_util:${project.qMiscUtil_version}"
 }
 
 processResources {
