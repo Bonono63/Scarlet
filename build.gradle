@@ -21,6 +21,9 @@ repositories {
 	maven {
 		url "https://maven.shedaniel.me/"
 	}
+	maven {
+		url "https://lazurite.dev/releases"
+	}
 }
 
 dependencies {
@@ -39,7 +42,7 @@ dependencies {
 		transitive(false)
 	}
 
-	modImplementation ('com.github.qouteall.ImmersivePortalsMod:imm_ptl_core:v1.3.3-1.18'){
+	modImplementation ("com.github.qouteall.ImmersivePortalsMod:imm_ptl_core:${project.immPtlCore_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
 		transitive(false)
 	}
@@ -48,8 +51,6 @@ dependencies {
 	{
 		exclude (group: "net.fabricmc.fabric-api")
 	}
-
-	include "com.github.qouteall.ImmersivePortalsMod:q_misc_util:${project.qMiscUtil_version}"
 }
 
 processResources {
