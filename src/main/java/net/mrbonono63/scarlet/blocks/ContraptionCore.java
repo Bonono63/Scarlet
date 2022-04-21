@@ -12,7 +12,7 @@ import net.minecraft.world.WorldAccess;
 
 public class ContraptionCore extends Block {
 
-    public static String Title = "";
+    public static String ShipName;
 
     public ContraptionCore(Settings settings) {
         super(settings);
