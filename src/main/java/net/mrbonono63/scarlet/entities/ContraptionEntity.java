@@ -16,15 +16,24 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.dimension.DimensionType;
 import net.mrbonono63.scarlet.Palette.BlockPalette;
 import net.mrbonono63.scarlet.Palette.STrackedDataHandlerRegistry;
 import net.mrbonono63.scarlet.blocks.SBlocks;
 import org.jetbrains.annotations.Nullable;
+import qouteall.q_misc_util.MiscHelper;
+import qouteall.q_misc_util.api.DimensionAPI;
 
 public class ContraptionEntity extends Entity {
 
@@ -35,6 +44,8 @@ public class ContraptionEntity extends Entity {
     //tracked entity's assigned dimension
     public static final TrackedData<String> DIM_ID;
 
+    DynamicRegistryManager manager = MiscHelper.getServer().getRegistryManager();
+
     static {
         ORIGIN_OFFSET_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
         END_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
@@ -42,10 +53,6 @@ public class ContraptionEntity extends Entity {
     }
 
     private EulerAngle rotation;
-
-    private double prevX;
-    private double prevY;
-    private double prevZ;
 
     //similar to how boats function
     private boolean pressingForward = false;
@@ -88,7 +95,8 @@ public class ContraptionEntity extends Entity {
         IN_WATER,
         UNDER_WATER,
         ON_LAND,
-        IN_AIR
+        IN_AIR,
+        IN_SPACE
     }
 
     public ContraptionEntity(EntityType<?> type, World world)
@@ -102,9 +110,6 @@ public class ContraptionEntity extends Entity {
         super(type, world);
         this.world = world;
         this.setPosition(x,y,z);
-        this.prevX = x;
-        this.prevY = y;
-        this.prevZ = z;
     }
 
     //Assemble and Disassemble
@@ -120,17 +125,19 @@ public class ContraptionEntity extends Entity {
     protected void initDataTracker() {
         this.dataTracker.startTracking(ORIGIN_OFFSET_POS, new BlockPos(0,0,0));
         this.dataTracker.startTracking(END_POS, new BlockPos(0,0,0));
-        this.dataTracker.startTracking(DIM_ID, "");
+        this.dataTracker.startTracking(DIM_ID, null);
     }
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
-
+        this.rotation = new EulerAngle(nbt.getFloat("yaw"), nbt.getFloat("pitch"), nbt.getFloat("roll"));
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-
+        nbt.putFloat("yaw", this.rotation.getYaw());
+        nbt.putFloat("pitch", this.rotation.getPitch());
+        nbt.putFloat("roll", this.rotation.getRoll());
     }
 
     //Uses what everything else uses I don't know what else I would use anyway.
@@ -145,6 +152,22 @@ public class ContraptionEntity extends Entity {
     public void baseTick() {
         this.checkBlockCollision();
         this.setBoundingBox(new Box(0,0,0, 1,1,1));
+
+        if (DIM_ID == null)
+        {
+            RegistryEntry<DimensionType> dimensionType = manager.getOptionalManaged(
+                    RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("namespace:dimension_type_id"))
+            ).get();
+
+            DimensionAPI.addDimensionDynamically(
+                    new Identifier("namespace:new_dimension_id"),
+                    new DimensionOptions(
+                            dimensionType,
+                            //TODO write a basic void chunk generator for the contraption dimension
+                            new CustomChunkGenerator(...)
+    )
+);
+        }
     }
 
     @Override
@@ -198,11 +221,6 @@ public class ContraptionEntity extends Entity {
     @Override
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false;
-    }
-
-    @Override
-    public int getSafeFallDistance() {
-        return 1000;
     }
 
     @Override
