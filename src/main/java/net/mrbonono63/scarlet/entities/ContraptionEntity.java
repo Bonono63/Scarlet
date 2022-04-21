@@ -16,7 +16,9 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.mrbonono63.scarlet.Palette.BlockPalette;
@@ -26,15 +28,20 @@ import org.jetbrains.annotations.Nullable;
 
 public class ContraptionEntity extends Entity {
 
-    public static final TrackedData<BlockPalette> BLOCK_PALETTE;
+    //The bottom corner of the entity in the dimension
+    public static final TrackedData<BlockPos> ORIGIN_OFFSET_POS;
+    //The top corner of the entity in the dimension
+    public static final TrackedData<BlockPos> END_POS;
+    //tracked entity's assigned dimension
+    public static final TrackedData<String> DIM_ID;
 
     static {
-        BLOCK_PALETTE = DataTracker.registerData(ContraptionEntity.class, STrackedDataHandlerRegistry.BLOCK_PALETTE);
+        ORIGIN_OFFSET_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
+        END_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
+        DIM_ID = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.STRING);
     }
 
-    private float yaw;
-    private float pitch;
-    private float roll;
+    private EulerAngle rotation;
 
     private double prevX;
     private double prevY;
@@ -65,7 +72,7 @@ public class ContraptionEntity extends Entity {
             airships, boats, and trains are all considerable more popular and there isn't too
             much practicality in submarines inside of Minecraft
 
-            but it would be cool
+            but it would be cool (its gonna happen whether or not you like it)
         */
     //Contraption entity types
     private enum Type{
@@ -108,21 +115,12 @@ public class ContraptionEntity extends Entity {
     public void Disassemble()
     {}
 
-    //retrieves the entities internal block palette
-    public BlockPalette getPalette()
-    {
-        return this.dataTracker.get(BLOCK_PALETTE);
-    }
-
-    //sets the entities internal block palette
-    public void setPalette(BlockPalette blockPalette) {
-        this.dataTracker.set(BLOCK_PALETTE, blockPalette);
-    }
-
     //Entity NBT Data
     @Override
     protected void initDataTracker() {
-        this.dataTracker.startTracking(BLOCK_PALETTE, new BlockPalette());
+        this.dataTracker.startTracking(ORIGIN_OFFSET_POS, new BlockPos(0,0,0));
+        this.dataTracker.startTracking(END_POS, new BlockPos(0,0,0));
+        this.dataTracker.startTracking(DIM_ID, "");
     }
 
     @Override
