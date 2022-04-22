@@ -28,12 +28,16 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
+import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.Palette.BlockPalette;
 import net.mrbonono63.scarlet.Palette.STrackedDataHandlerRegistry;
 import net.mrbonono63.scarlet.blocks.SBlocks;
+import net.mrbonono63.scarlet.server.ContraptionChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 import qouteall.q_misc_util.MiscHelper;
 import qouteall.q_misc_util.api.DimensionAPI;
+
+import java.util.UUID;
 
 public class ContraptionEntity extends Entity {
 
@@ -41,15 +45,10 @@ public class ContraptionEntity extends Entity {
     public static final TrackedData<BlockPos> ORIGIN_OFFSET_POS;
     //The top corner of the entity in the dimension
     public static final TrackedData<BlockPos> END_POS;
-    //tracked entity's assigned dimension
-    public static final TrackedData<String> DIM_ID;
-
-    DynamicRegistryManager manager = MiscHelper.getServer().getRegistryManager();
 
     static {
         ORIGIN_OFFSET_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
         END_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
-        DIM_ID = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.STRING);
     }
 
     private EulerAngle rotation;
@@ -125,7 +124,6 @@ public class ContraptionEntity extends Entity {
     protected void initDataTracker() {
         this.dataTracker.startTracking(ORIGIN_OFFSET_POS, new BlockPos(0,0,0));
         this.dataTracker.startTracking(END_POS, new BlockPos(0,0,0));
-        this.dataTracker.startTracking(DIM_ID, null);
     }
 
     @Override
@@ -152,22 +150,6 @@ public class ContraptionEntity extends Entity {
     public void baseTick() {
         this.checkBlockCollision();
         this.setBoundingBox(new Box(0,0,0, 1,1,1));
-
-        if (DIM_ID == null)
-        {
-            RegistryEntry<DimensionType> dimensionType = manager.getOptionalManaged(
-                    RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("namespace:dimension_type_id"))
-            ).get();
-
-            DimensionAPI.addDimensionDynamically(
-                    new Identifier("namespace:new_dimension_id"),
-                    new DimensionOptions(
-                            dimensionType,
-                            //TODO write a basic void chunk generator for the contraption dimension
-                            new CustomChunkGenerator(...)
-    )
-);
-        }
     }
 
     @Override
