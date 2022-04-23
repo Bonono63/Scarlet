@@ -1,15 +1,20 @@
 package net.mrbonono63.scarlet.server;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.BlockState;
 import net.minecraft.structure.StructureSet;
+import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntryList;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.GenerationStep;
@@ -24,25 +29,36 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class ContraptionChunkGenerator extends ChunkGenerator {
+    public static final Codec<ContraptionChunkGenerator> CODEC = RecordCodecBuilder.create((instance) -> {
+        return method_41042(instance).and(RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((debugChunkGenerator) -> {
+            return debugChunkGenerator.biomeRegistry;
+        })).apply(instance, instance.stable(ContraptionChunkGenerator::new));
+    });
+    private final Registry<Biome> biomeRegistry;
 
+    public ContraptionChunkGenerator(Registry<StructureSet> registry, Registry<Biome> biome) {
+        super(registry, Optional.empty(), new FixedBiomeSource(biome.getOrCreateEntry(BiomeKeys.PLAINS)));
+        this.biomeRegistry = biome;
+    }
 
-    public ContraptionChunkGenerator(Registry<StructureSet> registry, Optional<RegistryEntryList<StructureSet>> optional, BiomeSource biomeSource) {
-        super(registry, optional, biomeSource);
+    @Override
+    public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {
+
     }
 
     @Override
     protected Codec<? extends ChunkGenerator> getCodec() {
-        return null;
+        return CODEC;
     }
 
     @Override
     public ChunkGenerator withSeed(long seed) {
-        return null;
+        return this;
     }
 
     @Override
     public MultiNoiseUtil.MultiNoiseSampler getMultiNoiseSampler() {
-        return null;
+        return MultiNoiseUtil.method_40443();
     }
 
     @Override
@@ -67,7 +83,7 @@ public class ContraptionChunkGenerator extends ChunkGenerator {
 
     @Override
     public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
-        return null;
+        return CompletableFuture.completedFuture(chunk);
     }
 
     @Override
@@ -87,7 +103,7 @@ public class ContraptionChunkGenerator extends ChunkGenerator {
 
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world) {
-        return null;
+        return new VerticalBlockSample(0, new BlockState[0]);
     }
 
     @Override
