@@ -16,28 +16,13 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.dimension.DimensionType;
-import net.mrbonono63.scarlet.Main;
-import net.mrbonono63.scarlet.Palette.BlockPalette;
-import net.mrbonono63.scarlet.Palette.STrackedDataHandlerRegistry;
 import net.mrbonono63.scarlet.blocks.SBlocks;
-import net.mrbonono63.scarlet.server.ContraptionChunkGenerator;
 import org.jetbrains.annotations.Nullable;
-import qouteall.q_misc_util.MiscHelper;
-import qouteall.q_misc_util.api.DimensionAPI;
-
-import java.util.UUID;
 
 public class ContraptionEntity extends Entity {
 
