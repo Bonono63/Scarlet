@@ -21,7 +21,6 @@ public class ContraptionModel extends EntityModel<ContraptionEntity> {
 
     @Override
     public void setAngles(ContraptionEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-        this.blocks = entity.getPalette();
     }
 
     @Override
