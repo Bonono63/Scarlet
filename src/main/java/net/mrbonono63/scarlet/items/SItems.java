@@ -7,7 +7,7 @@ import net.mrbonono63.scarlet.Main;
 
 public class SItems {
 
-    public static final Item BEAN = register("bean", new Item(newSettings()));
+    //public static final Item BEAN = register("bean", new Item(newSettings()));
 
     public SItems(){}
 
@@ -21,6 +21,4 @@ public class SItems {
     public static <T extends Item> T register(String name, T item) {
         return Registry.register(Registry.ITEM, Main.identifier(name),item);
     }
-
-
 }
