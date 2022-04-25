@@ -16,25 +16,23 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.blocks.SBlocks;
+import net.mrbonono63.scarlet.server.contraption.Contraption;
 import org.jetbrains.annotations.Nullable;
 
 public class ContraptionEntity extends Entity {
 
-    //The bottom corner of the entity in the dimension
-    public static final TrackedData<BlockPos> ORIGIN_OFFSET_POS;
-    //The top corner of the entity in the dimension
-    public static final TrackedData<BlockPos> END_POS;
-
-    static {
-        ORIGIN_OFFSET_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
-        END_POS = DataTracker.registerData(ContraptionEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
-    }
+    //Local instance of the contraption entity that is then added to the Contraption List
+    Contraption contraption;
+    // Is used to delete the contraption from the List
+    private int contraptionListIndex = 0;
 
     private EulerAngle rotation;
 
@@ -83,37 +81,54 @@ public class ContraptionEntity extends Entity {
         IN_SPACE
     }
 
+    //Used when making the entity form a block
+    public ContraptionEntity(EntityType<?> type, World world, Contraption contraption)
+    {
+        super(type, world);
+        this.intersectionChecked = true;
+        this.contraption = contraption;
+    }
+
     public ContraptionEntity(EntityType<?> type, World world)
     {
         super(type, world);
         this.intersectionChecked = true;
     }
 
-    //constructor
-    public ContraptionEntity(EntityType<?> type, World world, double x, double y, double z) {
-        super(type, world);
-        this.world = world;
-        this.setPosition(x,y,z);
-    }
-
     //Assemble and Disassemble
 
-    public void Assemble()
-    {}
+    public void Assemble(Contraption contraption)
+    {
+        Main.contraptionDimensionHandler.addContraption(contraption);
+        // this needs to be called immediately after the contraption is added to the end of the list, otherwise it will
+        // delete the wrong contraption from the contraptionList in Main.
+        this.contraptionListIndex = Main.contraptionDimensionHandler.getListSize();
+        //decide how many maximum passengers there are and where the mount points are located in the entity
+        //Also needs to be done for block entities and regular blocks that can be interacted with, ( really just if
+        // possible every interaction including breaking blocks needs to be sent to the contraption inside the
+        // dimension to allow for literally all functionality from vanilla and mods being the best solution)
+    }
 
     public void Disassemble()
-    {}
-
-    //Entity NBT Data
-    @Override
-    protected void initDataTracker() {
-        this.dataTracker.startTracking(ORIGIN_OFFSET_POS, new BlockPos(0,0,0));
-        this.dataTracker.startTracking(END_POS, new BlockPos(0,0,0));
+    {
+        Main.contraptionDimensionHandler.removeContraption(this.contraptionListIndex);
     }
+
+    /*
+        Entity NBT Data and data tracker
+
+        Remember NBT data is for local server use (saving and loading then being used server side)
+        While Tracked Data is synced between the client and server and is important for things like models etc.
+     */
+    @Override
+    protected void initDataTracker() {}
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         this.rotation = new EulerAngle(nbt.getFloat("yaw"), nbt.getFloat("pitch"), nbt.getFloat("roll"));
+
+        //read the custom data from nbt
+        this.contraption = readContraptionData(nbt);
     }
 
     @Override
@@ -121,6 +136,34 @@ public class ContraptionEntity extends Entity {
         nbt.putFloat("yaw", this.rotation.getYaw());
         nbt.putFloat("pitch", this.rotation.getPitch());
         nbt.putFloat("roll", this.rotation.getRoll());
+
+        //write the contraption data
+        writeContraptionData(nbt);
+    }
+
+    public void writeContraptionData(NbtCompound nbt)
+    {
+        //write the namespace of the dimension
+        nbt.putString("namespace", this.contraption.originDimensionID.getNamespace());
+        nbt.putString("dim_id", this.contraption.originDimensionID.getPath());
+        //write the block pos of the origin
+        nbt.putIntArray("originBlockPos1", new int[] {this.contraption.originCorner1.getX(), this.contraption.originCorner1.getY(), this.contraption.originCorner1.getZ()});
+        nbt.putIntArray("originBlockPos2", new int[] {this.contraption.originCorner2.getX(), this.contraption.originCorner2.getY(), this.contraption.originCorner2.getZ()});
+        //write the block pos of the contraption (in the contraption dimension)
+        nbt.putIntArray("contraptionBlockPos1", new int[] {this.contraption.contraptionCorner1.getX(), this.contraption.contraptionCorner1.getY(), this.contraption.contraptionCorner1.getZ()});
+        nbt.putIntArray("contraptionBlockPos2", new int[] {this.contraption.contraptionCorner2.getX(), this.contraption.contraptionCorner2.getY(), this.contraption.contraptionCorner2.getZ()});
+    }
+
+    public Contraption readContraptionData(NbtCompound nbt)
+    {
+        //origin block pos read
+        int[] originBlockPos1 = nbt.getIntArray("originBlockPos1");
+        int[] originBlockPos2 = nbt.getIntArray("originBlockPos2");
+        //contraption block pos read
+        int[] contraptionBlockPos1 = nbt.getIntArray("contraptionBlockPos1");
+        int[] contraptionBlockPos2 = nbt.getIntArray("contraptionBlockPos2");
+
+        return new Contraption(new Identifier (nbt.getString("namespace"), nbt.getString("dim_id")), new BlockPos(originBlockPos1[0], originBlockPos1[1], originBlockPos1[2]), new BlockPos(originBlockPos2[0], originBlockPos2[1], originBlockPos2[2]), new BlockPos(contraptionBlockPos1[0], contraptionBlockPos1[1], contraptionBlockPos1[2]), new BlockPos(contraptionBlockPos2[0], contraptionBlockPos2[1], contraptionBlockPos2[2]));
     }
 
     //Uses what everything else uses I don't know what else I would use anyway.
@@ -135,6 +178,11 @@ public class ContraptionEntity extends Entity {
     public void baseTick() {
         this.checkBlockCollision();
         this.setBoundingBox(new Box(0,0,0, 1,1,1));
+
+        if (contraption == null)
+        {
+            Main.LOGGER.info(getEntityName()+" is missing contraption data");
+        }
     }
 
     @Override
@@ -146,8 +194,14 @@ public class ContraptionEntity extends Entity {
 
     @Override
     public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
-        System.out.println(player.getDisplayName() + "Interacted with " + getEntityName());
-        return ActionResult.SUCCESS;
+        if (player.shouldCancelInteraction())
+        {
+            return ActionResult.PASS;
+        } else
+        {
+            System.out.println(player.getDisplayName() + "Interacted with " + getEntityName() + " at " + hitPos.toString());
+            return ActionResult.SUCCESS;
+        }
     }
 
     //Passenger handling TODO set the maximum number of passengers to the number of seats available on assembly of the entity instead of an arbitrary amount, this will be handled when entity assembly is added.
