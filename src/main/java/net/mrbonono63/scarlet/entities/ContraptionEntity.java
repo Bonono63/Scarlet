@@ -5,9 +5,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -24,17 +21,17 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.blocks.SBlocks;
-import net.mrbonono63.scarlet.server.contraption.Contraption;
+import net.mrbonono63.scarlet.server.Contraption;
 import org.jetbrains.annotations.Nullable;
 
 public class ContraptionEntity extends Entity {
 
     //Local instance of the contraption entity that is then added to the Contraption List
-    Contraption contraption;
+    Contraption contraption = new Contraption(new Identifier("", ""), new BlockPos(0,0,0), new BlockPos(0,0,0), new BlockPos(0,0,0), new BlockPos(0,0,0));
     // Is used to delete the contraption from the List
     private int contraptionListIndex = 0;
 
-    private EulerAngle rotation;
+    private EulerAngle rotation = new EulerAngle(0.0f, 0.0f, 0.0f);
 
     //similar to how boats function
     private boolean pressingForward = false;

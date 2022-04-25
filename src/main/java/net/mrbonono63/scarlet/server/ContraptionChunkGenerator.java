@@ -78,7 +78,7 @@ public class ContraptionChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getWorldHeight() {
-        return 128;
+        return 256;
     }
 
     @Override
@@ -98,7 +98,7 @@ public class ContraptionChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getHeight(int x, int z, Heightmap.Type heightmap, HeightLimitView world) {
-        return 128;
+        return 256;
     }
 
     @Override

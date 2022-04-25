@@ -1,4 +1,4 @@
-package net.mrbonono63.scarlet.server.contraption;
+package net.mrbonono63.scarlet.server;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
