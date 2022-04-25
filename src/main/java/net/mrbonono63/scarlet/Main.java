@@ -1,6 +1,7 @@
 package net.mrbonono63.scarlet;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.structure.StructureSet;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -13,6 +14,7 @@ import net.mrbonono63.scarlet.blocks.SBlocks;
 import net.mrbonono63.scarlet.entities.SEntity;
 import net.mrbonono63.scarlet.items.SItems;
 import net.mrbonono63.scarlet.server.ContraptionChunkGenerator;
+import net.mrbonono63.scarlet.server.ContraptionDimensionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qouteall.q_misc_util.LifecycleHack;
@@ -25,6 +27,7 @@ public class Main implements ModInitializer {
 	{
 		return new Identifier(Main.MOD_ID, name);
 	}
+	public static ContraptionDimensionHandler contraptionDimensionHandler = new ContraptionDimensionHandler();
 
 	@Override
 	public void onInitialize() {
@@ -56,13 +59,22 @@ public class Main implements ModInitializer {
 					new ContraptionChunkGenerator(structureRegistry, biomeRegistry)
 			);
 
-			// mark it non-persistent so it won't be saved into level.dat
+			// Mark the dimension non-persistent so it won't be saved into level.dat
 			//TODO decide whether to make the dimension persistent (this will decide whether it's contents will be saved or not within the level.dat)
 			DimensionAPI.markDimensionNonPersistent(dimId);
 			LOGGER.info("Scarlet Contraption Dimension marked as non persistent");
-			//May or may note work, but supposed to mark scarlet as stable
+			// Supposed to mark scarlet as stable
 			LifecycleHack.markNamespaceStable("scarlet");
 			LOGGER.info("Scarlet marked as safe namespace");
+		});
+
+
+		ServerTickEvents.START_WORLD_TICK.register((serverWorld) -> {
+			//either compare the index size or the whole list to a previous ticks list to decide whether to update the dimension or not
+			//The contraption entity can then add or remove its contraption data from the dimension handler
+			if (!serverWorld.isClient) {
+				contraptionDimensionHandler.tick();
+			}
 		});
 
 		LOGGER.info("Scarlet Initialization complete");
