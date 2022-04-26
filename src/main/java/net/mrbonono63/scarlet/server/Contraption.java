@@ -20,6 +20,11 @@ public class Contraption {
         this.contraptionCorner2 = contraptionCorner2;
     }
 
+    //return the 1st origin corner
+    public Identifier getOriginDimensionID()
+    {
+        return this.originDimensionID;
+    }
 
     //return the 1st origin corner
     public BlockPos getOriginCorner1()

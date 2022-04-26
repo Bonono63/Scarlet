@@ -1,7 +1,5 @@
 package net.mrbonono63.scarlet.server;
 
-import net.mrbonono63.scarlet.server.contraption.Contraption;
-
 import java.util.*;
 
 public class ContraptionDimensionHandler {
