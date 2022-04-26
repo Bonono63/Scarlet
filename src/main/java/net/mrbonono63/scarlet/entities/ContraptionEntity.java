@@ -1,6 +1,7 @@
 package net.mrbonono63.scarlet.entities;
 
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -18,11 +19,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.blocks.SBlocks;
 import net.mrbonono63.scarlet.server.Contraption;
+import net.mrbonono63.scarlet.util.NBTReadBlockPos;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 public class ContraptionEntity extends Entity {
 
@@ -30,6 +37,7 @@ public class ContraptionEntity extends Entity {
     Contraption contraption = new Contraption(new Identifier("", ""), new BlockPos(0,0,0), new BlockPos(0,0,0), new BlockPos(0,0,0), new BlockPos(0,0,0));
     // Is used to delete the contraption from the List
     private int contraptionListIndex = 0;
+    private World world;
 
     private EulerAngle rotation = new EulerAngle(0.0f, 0.0f, 0.0f);
 
@@ -82,14 +90,16 @@ public class ContraptionEntity extends Entity {
     public ContraptionEntity(EntityType<?> type, World world, Contraption contraption)
     {
         super(type, world);
-        this.intersectionChecked = true;
+        //this.intersectionChecked = true;
         this.contraption = contraption;
+        this.world = world;
     }
 
     public ContraptionEntity(EntityType<?> type, World world)
     {
         super(type, world);
-        this.intersectionChecked = true;
+        this.world = world;
+        //this.intersectionChecked = true;
     }
 
     //Assemble and Disassemble
@@ -124,8 +134,8 @@ public class ContraptionEntity extends Entity {
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         this.rotation = new EulerAngle(nbt.getFloat("yaw"), nbt.getFloat("pitch"), nbt.getFloat("roll"));
 
-        //read the custom data from nbt
-        this.contraption = readContraptionData(nbt);
+        this.contraption = readContraptionNBTData(nbt);
+        Main.LOGGER.info(this.contraption.getOriginDimensionID().toString() + " " + this.contraption.getOriginCorner1() + " " + this.contraption.getOriginCorner2() + " " + this.contraption.getContraptionCorner1() + " " + this.contraption.getContraptionCorner2());
     }
 
     @Override
@@ -143,24 +153,20 @@ public class ContraptionEntity extends Entity {
         //write the namespace of the dimension
         nbt.putString("namespace", this.contraption.originDimensionID.getNamespace());
         nbt.putString("dim_id", this.contraption.originDimensionID.getPath());
-        //write the block pos of the origin
-        nbt.putIntArray("originBlockPos1", new int[] {this.contraption.originCorner1.getX(), this.contraption.originCorner1.getY(), this.contraption.originCorner1.getZ()});
-        nbt.putIntArray("originBlockPos2", new int[] {this.contraption.originCorner2.getX(), this.contraption.originCorner2.getY(), this.contraption.originCorner2.getZ()});
-        //write the block pos of the contraption (in the contraption dimension)
-        nbt.putIntArray("contraptionBlockPos1", new int[] {this.contraption.contraptionCorner1.getX(), this.contraption.contraptionCorner1.getY(), this.contraption.contraptionCorner1.getZ()});
-        nbt.putIntArray("contraptionBlockPos2", new int[] {this.contraption.contraptionCorner2.getX(), this.contraption.contraptionCorner2.getY(), this.contraption.contraptionCorner2.getZ()});
+        NBTReadBlockPos.writeBlockPos("originBlockPos", this.contraption.getOriginCorner1(), nbt);
+        NBTReadBlockPos.writeBlockPos("originBlockPos_", this.contraption.getOriginCorner2(), nbt);
+        NBTReadBlockPos.writeBlockPos("contraptionBlockPos", this.contraption.getContraptionCorner1(), nbt);
+        NBTReadBlockPos.writeBlockPos("contraptionBlockPos_", this.contraption.getContraptionCorner2(), nbt);
     }
 
-    public Contraption readContraptionData(NbtCompound nbt)
+    public Contraption readContraptionNBTData(NbtCompound nbt)
     {
-        //origin block pos read
-        int[] originBlockPos1 = nbt.getIntArray("originBlockPos1");
-        int[] originBlockPos2 = nbt.getIntArray("originBlockPos2");
-        //contraption block pos read
-        int[] contraptionBlockPos1 = nbt.getIntArray("contraptionBlockPos1");
-        int[] contraptionBlockPos2 = nbt.getIntArray("contraptionBlockPos2");
+        BlockPos originBlockPos = NBTReadBlockPos.readBlockPos("originBlockPos",nbt) ;
+        BlockPos originBlockPos_ = NBTReadBlockPos.readBlockPos("originBlockPos_",nbt) ;
+        BlockPos contraptionBlockPos = NBTReadBlockPos.readBlockPos("contraptionBlockPos",nbt) ;
+        BlockPos contraptionBlockPos_ = NBTReadBlockPos.readBlockPos("contraptionBlockPos_",nbt) ;
 
-        return new Contraption(new Identifier (nbt.getString("namespace"), nbt.getString("dim_id")), new BlockPos(originBlockPos1[0], originBlockPos1[1], originBlockPos1[2]), new BlockPos(originBlockPos2[0], originBlockPos2[1], originBlockPos2[2]), new BlockPos(contraptionBlockPos1[0], contraptionBlockPos1[1], contraptionBlockPos1[2]), new BlockPos(contraptionBlockPos2[0], contraptionBlockPos2[1], contraptionBlockPos2[2]));
+        return new Contraption(new Identifier (nbt.getString("namespace"), nbt.getString("dim_id")), originBlockPos, originBlockPos_, contraptionBlockPos, contraptionBlockPos_);
     }
 
     //Uses what everything else uses I don't know what else I would use anyway.
@@ -174,12 +180,15 @@ public class ContraptionEntity extends Entity {
     @Override
     public void baseTick() {
         this.checkBlockCollision();
-        this.setBoundingBox(new Box(0,0,0, 1,1,1));
+        //this.setBoundingBox(new Box(0,0,0, 1,1,1));
 
         if (contraption == null)
         {
             Main.LOGGER.info(getEntityName()+" is missing contraption data");
         }
+
+        RegistryEntry<DimensionType> world_registry = world.method_40134();
+        world_registry.getType();
     }
 
     @Override
