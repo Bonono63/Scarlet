@@ -11,6 +11,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.mrbonono63.scarlet.blocks.SBlocks;
+import net.mrbonono63.scarlet.blocks.entities.SBlockEntity;
 import net.mrbonono63.scarlet.entities.SEntity;
 import net.mrbonono63.scarlet.items.SItems;
 import net.mrbonono63.scarlet.server.ContraptionChunkGenerator;
@@ -37,6 +38,8 @@ public class Main implements ModInitializer {
 		LOGGER.info("Items have been initialized");
 		SEntity.init();
 		LOGGER.info("Entities have been initialized");
+		SBlockEntity.init();
+		LOGGER.info("Block Entities have been intialized");
 
 
 		DimensionAPI.serverDimensionsLoadEvent.register((generatorOptions, registryManager) -> {
