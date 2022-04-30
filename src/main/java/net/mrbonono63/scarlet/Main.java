@@ -76,7 +76,7 @@ public class Main implements ModInitializer {
 			//either compare the index size or the whole list to a previous ticks list to decide whether to update the dimension or not
 			//The contraption entity can then add or remove its contraption data from the dimension handler
 			if (!serverWorld.isClient) {
-				contraptionDimensionHandler.tick();
+				contraptionDimensionHandler.tick(serverWorld);
 			}
 		});
 
