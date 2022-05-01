@@ -2,6 +2,7 @@ package net.mrbonono63.scarlet.entities;
 
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -34,6 +35,8 @@ public class ContraptionEntity extends Entity {
     private World world;
 
     private EulerAngle rotation = new EulerAngle(0.0f, 0.0f, 0.0f);
+
+    private EntityDimensions entityDimensions = new EntityDimensions(1.0f, 1.0f, false);
 
     //similar to how boats function
     private boolean pressingForward = false;
