@@ -16,6 +16,7 @@ import net.mrbonono63.scarlet.entities.SEntity;
 import net.mrbonono63.scarlet.items.SItems;
 import net.mrbonono63.scarlet.server.ContraptionChunkGenerator;
 import net.mrbonono63.scarlet.server.ContraptionDimensionHandler;
+import net.mrbonono63.scarlet.server.SScreenHandlers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qouteall.q_misc_util.LifecycleHack;
@@ -40,6 +41,7 @@ public class Main implements ModInitializer {
 		LOGGER.info("Entities have been initialized");
 		SBlockEntity.init();
 		LOGGER.info("Block Entities have been intialized");
+		SScreenHandlers.init();
 
 
 		DimensionAPI.serverDimensionsLoadEvent.register((generatorOptions, registryManager) -> {
