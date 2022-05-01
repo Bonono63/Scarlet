@@ -29,11 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class ContraptionChunkGenerator extends ChunkGenerator {
-    public static final Codec<ContraptionChunkGenerator> CODEC = RecordCodecBuilder.create((instance) -> {
-        return method_41042(instance).and(RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((debugChunkGenerator) -> {
-            return debugChunkGenerator.biomeRegistry;
-        })).apply(instance, instance.stable(ContraptionChunkGenerator::new));
-    });
+    public static final Codec<ContraptionChunkGenerator> CODEC = RecordCodecBuilder.create((instance) -> method_41042(instance).and(RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((debugChunkGenerator) -> debugChunkGenerator.biomeRegistry)).apply(instance, instance.stable(ContraptionChunkGenerator::new)));
     private final Registry<Biome> biomeRegistry;
 
     public ContraptionChunkGenerator(Registry<StructureSet> registry, Registry<Biome> biome) {
