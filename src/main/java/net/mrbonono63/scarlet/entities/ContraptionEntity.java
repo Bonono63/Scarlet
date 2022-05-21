@@ -2,7 +2,6 @@ package net.mrbonono63.scarlet.entities;
 
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -10,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -18,11 +16,12 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.blocks.SBlocks;
+import net.mrbonono63.scarlet.network.EntitySpawnPacket;
+import net.mrbonono63.scarlet.network.SPackets;
+import net.mrbonono63.scarlet.server.Contraption;
 import net.mrbonono63.scarlet.util.NBTUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,11 +31,8 @@ public class ContraptionEntity extends Entity {
     BlockBox contraption = BlockBox.create(Vec3i.ZERO, Vec3i.ZERO);
     // Is used to delete the contraption from the List
     private int contraptionListIndex = 0;
-    private World world;
 
     private EulerAngle rotation = new EulerAngle(0.0f, 0.0f, 0.0f);
-
-    private EntityDimensions entityDimensions = new EntityDimensions(1.0f, 1.0f, false);
 
     //similar to how boats function
     private boolean pressingForward = false;
@@ -84,24 +80,29 @@ public class ContraptionEntity extends Entity {
     }
 
     //Used when making the entity form a block
-    public ContraptionEntity(EntityType<?> type, World world, BlockBox box)
+    public ContraptionEntity(World world, BlockBox box)
     {
-        super(type, world);
+        super(SEntity.CONTRAPTION_ENTITY_TYPE, world);
         //this.intersectionChecked = true;
         this.contraption = box;
-        this.world = world;
+        Assemble(new Contraption(box, (ServerWorld) world));
     }
 
     public ContraptionEntity(EntityType<?> type, World world)
     {
         super(type, world);
-        this.world = world;
-        //this.intersectionChecked = true;
+        this.intersectionChecked = true;
+    }
+
+    public ContraptionEntity(World world)
+    {
+        super(SEntity.CONTRAPTION_ENTITY_TYPE, world);
+        this.intersectionChecked = true;
     }
 
     //Assemble and Disassemble
 
-    public void Assemble(BlockBox contraption)
+    public void Assemble(Contraption contraption)
     {
         Main.contraptionDimensionHandler.addContraption(contraption);
         //this needs to be called immediately after the contraption is added to the end of the list, otherwise it will
@@ -163,14 +164,13 @@ public class ContraptionEntity extends Entity {
     //Uses what everything else uses I don't know what else I would use anyway.
     @Override
     public Packet<?> createSpawnPacket() {
-        return new EntitySpawnS2CPacket(this);
+        return EntitySpawnPacket.create(this, SPackets.PacketID);
     }
 
     //Base Tick
     //Essentially the main entity loop, happens every tick
     @Override
     public void baseTick() {
-
 
     }
 
