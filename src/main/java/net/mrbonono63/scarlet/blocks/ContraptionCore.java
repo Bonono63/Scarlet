@@ -4,19 +4,36 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.blocks.entities.ContraptionCoreBlockEntity;
 import net.mrbonono63.scarlet.blocks.entities.SBlockEntity;
+import net.mrbonono63.scarlet.entities.ContraptionEntity;
+import net.mrbonono63.scarlet.entities.SEntity;
+import net.mrbonono63.scarlet.server.Contraption;
+import org.apache.logging.log4j.core.jmx.Server;
+
+import java.util.Objects;
+
 public class ContraptionCore extends BlockWithEntity implements BlockEntityProvider {
 
     public static String ShipName;
+    public static int MAXIMUM_LENGTH = 128;
+    public static BlockBox box = BlockBox.create(Vec3i.ZERO, Vec3i.ZERO);
 
     public ContraptionCore(Settings settings) {
         super(settings);
@@ -43,22 +60,7 @@ public class ContraptionCore extends BlockWithEntity implements BlockEntityProvi
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        System.out.println("was clicked");
-        if (!world.isClient)  {
-            //This will call the createScreenHandlerFactory method from BlockWithEntity, which will return our blockEntity casted to
-            //a namedScreenHandlerFactory. If your block class does not extend BlockWithEntity, it needs to implement createScreenHandlerFactory.
-            NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
-
-            if (screenHandlerFactory != null) {
-                //With this call the server will request the client to open the appropriate Screenhandler
-                player.openHandledScreen(screenHandlerFactory);
-            }
-        }
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
         return ActionResult.SUCCESS;
-    }
-
-    @Override
-    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
-        System.out.println("was broken");
     }
 }
