@@ -24,6 +24,10 @@ repositories {
 	maven {
 		url "https://lazurite.dev/releases"
 	}
+	maven {
+		name = "CottonMC"
+		url = "https://server.bbkr.space/artifactory/libs-release"
+	}
 }
 
 dependencies {
@@ -36,7 +40,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modMenu_version}"
-
+/*
 	modImplementation ("com.github.qouteall.ImmersivePortalsMod:q_misc_util:${project.qMiscUtil_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
 		transitive(false)
@@ -47,10 +51,14 @@ dependencies {
 		transitive(false)
 	}
 
+ */
+
 	modApi ("me.shedaniel.cloth:cloth-config-fabric:${project.clothConfig_version}")
 	{
 		exclude (group: "net.fabricmc.fabric-api")
 	}
+
+	modImplementation include("io.github.cottonmc:LibGui:${project.libgui_version}")
 }
 
 processResources {
