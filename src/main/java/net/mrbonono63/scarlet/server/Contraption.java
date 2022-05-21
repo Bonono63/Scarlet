@@ -1,5 +1,6 @@
 package net.mrbonono63.scarlet.server;
 
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
@@ -7,12 +8,12 @@ import net.minecraft.util.math.BlockPos;
 public class Contraption {
 
     public BlockBox originBlockBox;
-    public BlockBox contraptionBlockBox;
+    public ServerWorld originDimension;
 
-    public Contraption(BlockBox originBlockBox, BlockBox contraptionBlockBox)
+    public Contraption(BlockBox originBlockBox, ServerWorld originServer)
     {
         this.originBlockBox = BlockBox.create(BlockPos.ZERO, BlockPos.ZERO);
-        this.contraptionBlockBox = BlockBox.create(BlockPos.ZERO, BlockPos.ZERO);
+        this.originDimension = originServer;
     }
 
     public void setOriginBlockBox(BlockPos begin, BlockPos end)
@@ -20,8 +21,12 @@ public class Contraption {
         this.originBlockBox = BlockBox.create(begin, end);
     }
 
-    public void setContraptionBlockBox(BlockPos begin, BlockPos end)
+    public BlockBox getOriginBlockBox() {
+        return this.originBlockBox;
+    }
+
+    public ServerWorld getServerWorld()
     {
-        this.contraptionBlockBox = BlockBox.create(begin, end);
+        return this.originDimension;
     }
 }
