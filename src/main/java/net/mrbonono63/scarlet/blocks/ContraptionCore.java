@@ -25,14 +25,13 @@ import net.mrbonono63.scarlet.blocks.entities.SBlockEntity;
 import net.mrbonono63.scarlet.entities.ContraptionEntity;
 import net.mrbonono63.scarlet.entities.SEntity;
 import net.mrbonono63.scarlet.server.Contraption;
+import net.mrbonono63.scarlet.util.OriginBoxUtil;
 import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.Objects;
 
 public class ContraptionCore extends BlockWithEntity implements BlockEntityProvider {
 
-    public static String ShipName;
-    public static int MAXIMUM_LENGTH = 128;
     public static BlockBox box = BlockBox.create(Vec3i.ZERO, Vec3i.ZERO);
 
     public ContraptionCore(Settings settings) {
@@ -60,7 +59,18 @@ public class ContraptionCore extends BlockWithEntity implements BlockEntityProvi
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        Main.LOGGER.info("Clicked "+ this);
+        Main.LOGGER.info("Pos: "+ pos);
+        int scale = 16;
+        if (OriginBoxUtil.calc(world, pos, scale) != null)
+        {
+            box = OriginBoxUtil.calc(world, pos, scale);
+            Main.LOGGER.info(box.getDimensions().toString());
+        } else
+        {
+            Main.LOGGER.info("OriginBoxUtil.Calc returned null, this means the contraption exceeded size limits");
+            return ActionResult.FAIL;
+        }
         return ActionResult.SUCCESS;
     }
 }
