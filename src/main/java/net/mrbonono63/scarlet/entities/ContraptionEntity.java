@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -19,8 +20,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.mrbonono63.scarlet.Main;
 import net.mrbonono63.scarlet.blocks.SBlocks;
-import net.mrbonono63.scarlet.network.EntitySpawnPacket;
-import net.mrbonono63.scarlet.network.SPackets;
 import net.mrbonono63.scarlet.server.Contraption;
 import net.mrbonono63.scarlet.util.NBTUtil;
 import org.jetbrains.annotations.Nullable;
@@ -164,7 +163,7 @@ public class ContraptionEntity extends Entity {
     //Uses what everything else uses I don't know what else I would use anyway.
     @Override
     public Packet<?> createSpawnPacket() {
-        return EntitySpawnPacket.create(this, SPackets.PacketID);
+        return new EntitySpawnS2CPacket(this);
     }
 
     //Base Tick

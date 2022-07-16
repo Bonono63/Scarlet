@@ -12,5 +12,7 @@
   "logical_height": 128,
   "infiniburn": "#scarlet:infiniburn_contraption",
   "min_y": 0,
-  "height": 128
+  "height": 128,
+  "monster_spawn_block_light_limit": 0,
+  "monster_spawn_light_level": 0
 }

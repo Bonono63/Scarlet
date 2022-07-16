@@ -5,10 +5,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.util.Identifier;
 import net.mrbonono63.scarlet.blocks.SBlocks;
 import net.mrbonono63.scarlet.blocks.entities.SBlockEntity;
-import net.mrbonono63.scarlet.client.gui.SScreenHandlers;
 import net.mrbonono63.scarlet.entities.SEntity;
 import net.mrbonono63.scarlet.items.SItems;
-import net.mrbonono63.scarlet.network.SPackets;
 import net.mrbonono63.scarlet.server.ContraptionDimensionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +21,6 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		SPackets.init();
-		LOGGER.info("Packets Registered");
 		SBlocks.init();
 		LOGGER.info("Blocks have been initialized");
 		SItems.init();
@@ -33,8 +29,6 @@ public class Main implements ModInitializer {
 		LOGGER.info("Entities have been initialized");
 		SBlockEntity.init();
 		LOGGER.info("Block Entities have been initialized");
-		SScreenHandlers.init();
-		LOGGER.info("Screen Handlers have been initialized");
 
 		ServerTickEvents.START_WORLD_TICK.register((serverWorld) -> {
 			//either compare the index size or the whole list to a previous ticks list to decide whether to update the dimension or not
